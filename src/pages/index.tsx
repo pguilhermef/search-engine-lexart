@@ -1,3 +1,4 @@
+import DisplayMessage from "@/components/DisplayMessage";
 import IProduct from "@/interfaces/IProduct";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,15 +13,25 @@ export default function Home() {
   const [category, setCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearched, setIsSearched] = useState(false)
+  const [message, setMessage] = useState('initial')
 
   useEffect(() => {
     if (isSearched) {
-      setIsSearched(false)
+    setIsSearched(false)
 
-      fetch('/api/products')
-        .then(response => response.json())
-        .then(products => setProducts(products.data))
+    setMessage('searching')
+
+    fetch(`/api/buscape?categorieToSearch=${encodeURIComponent(category)}&searchInput=${encodeURIComponent(searchQuery)}`)
+      .then(response => response.json())
+      .then(data => {
+        if(!data){
+          setProducts([])
+        }
+        setProducts(data.products)
+      })
+      .then(() => setMessage('errorInSearch'))
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSearched])
 
   const handleWebsiteChange = (event: React.ChangeEvent<EventTarget | HTMLInputElement>) => {
@@ -45,7 +56,7 @@ export default function Home() {
   return (
     <main className="h-screen w-screen flex justify-center items-center">
       <div className="flex flex-col justify-start items-center bg-white border-4 border-black h-5/6 w-3/4 max-w-5xl">
-        <div className="flex items-center my-10 gap-x-4">
+        <div className="flex justify-center items-center my-10 gap-4 flex-wrap">
           <div>
             <label htmlFor="website" className="sr-only">
               Website
@@ -121,12 +132,10 @@ export default function Home() {
                 <div className='flex flex-col items-start mx-5 gap-y-4'>
                   <div className='font-semibold text-xl'>
                     {/* here catch the first two words of name */}
-                    {product.title.split(" ").slice(0, 4).join(" ")}
+                    {product.title}
                   </div>
                   <div className='max-w-[20rem]'>
-                    {
-                    product.description.length > 100 ?
-                    `${product.description.slice(0, 100)}...` : product.description}
+                    {product.description}
                   </div>
                   <div className='font-semibold text-xl'>
                     {product.price}
@@ -147,9 +156,7 @@ export default function Home() {
           ))}
         </div>
         ) : (
-          <div>
-            Pesquise por um produto!
-          </div>
+          <DisplayMessage message={message} />
         )}
       </div>
     </main>
