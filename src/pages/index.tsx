@@ -1,8 +1,14 @@
 import DisplayMessage from "@/components/DisplayMessage";
 import IProduct from "@/interfaces/IProduct";
+
 import Image from "next/image";
 import Link from "next/link";
+
 import { useEffect, useState } from "react"
+
+import meliLogo from '../../public/logo-meli.png'
+import buscapeLogo from '../../public/logo-buscape.png'
+
 
 const categories = ['Geladeira', 'TV', 'Celular'];
 const sellersOptions = ['Todas', 'Mercado Livre', 'Buscapé'];
@@ -126,7 +132,18 @@ export default function Home() {
               <div className='flex justify-center items-center'>
                 {/* Image */}
                 <div>
-                  <Image src={product.photo} alt={product.description} width={200} height={200}/>
+                  <div>
+                    <Image
+                      src={ product.seller === 'buscape' ? buscapeLogo : meliLogo }
+                      alt={ `Logo of ${product.seller}` }
+                      width={25}
+                      height={25}
+                      className='float-right'
+                    />
+                  </div>
+                  <div>
+                    <Image src={product.photo} alt={product.description} width={200} height={200}/>
+                  </div>
                 </div>
                 {/* Infos */}
                 <div className='flex flex-col items-start mx-5 gap-y-4'>
