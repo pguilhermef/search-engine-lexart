@@ -8,13 +8,14 @@ import { useEffect, useState } from "react"
 
 import meliLogo from '../../public/logo-meli.png'
 import buscapeLogo from '../../public/logo-buscape.png'
+import { fetchBuscape, fetchMeli } from "../../lib/fetchs";
 
 
 const categories = ['Geladeira', 'TV', 'Celular'];
 const sellersOptions = ['Todas', 'Mercado Livre', 'Buscapé'];
 
 export default function Home() {
-  const [products, setProducts] = useState([]) 
+  const [products, setProducts] = useState<IProduct[]>([]) 
   const [seller, setSeller] = useState('');
   const [category, setCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,17 +29,27 @@ export default function Home() {
     setMessage('searching')
     setIsLoading(true)
 
-    fetch(`/api/buscape?categorieToSearch=${encodeURIComponent(category)}&searchInput=${encodeURIComponent(searchQuery)}`)
-      .then(response => response.json())
-      .then(data => {
-        if(!data){
-          setProducts([])
-        }
-        setProducts(data.products)
-      })
-      .then(() => setIsLoading(false))
-
-    }
+    switch (seller) {
+      case 'Mercado Livre':
+        fetchMeli(category, searchQuery)
+          .then(products => setProducts(products))
+          .then(() => setIsLoading(false))
+        break;
+      case 'Buscapé':
+        fetchBuscape(category, searchQuery)
+          .then(products => setProducts(products))
+          .then(() => setIsLoading(false))
+      default:
+        Promise.all([
+          fetchMeli(category, searchQuery),
+          fetchBuscape(category, searchQuery)
+        ]).then(([meliProducts, buscapeProducts]) => {
+          setProducts([...meliProducts, ...buscapeProducts] as IProduct[])
+          setIsLoading(false)
+        })
+        break;
+    } 
+  }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSearched])
 
