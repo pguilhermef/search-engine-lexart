@@ -1,33 +1,42 @@
 const puppeteer = require('puppeteer');
 
 export default async function buscapeScraping(categorieToSearch, searchInput) {
-  const buscapeUrl = 'https://www.buscape.com.br/';
   const products = [];
   let count = 0;
 
+  let categoryId = 0;
+  const tvId = 3;
+  const cellId = 7;
+  const refrigeratorId = 8;
 
-  const browser = await puppeteer.launch()
+  switch (categorieToSearch) {
+    case 'Geladeira':
+      categoryId = refrigeratorId;
+      break;
+    case 'TV':
+      categoryId = tvId;
+      break;
+    case 'Celular':
+      categoryId = cellId;
+      break;
+    default:
+      console.log('Error on category search');
+  }
+
+  const buscapeUrl = `https://www.buscape.com.br/search?q=${searchInput}&refinements%5B0%5D%5Bid%5D=categoryId&refinements%5B0%5D%5Bvalues%5D%5B0%5D=${categoryId}&isDealsPage=false`
+
+  const browser = await puppeteer.launch({ headless: false })
   const page = await browser.newPage()
   await page.setViewport({ width: 1200, height: 800 });
 
   await page.goto(buscapeUrl, { waitUntil: 'domcontentloaded' })
-  await page.type('.AutoCompleteStyle_input__HG105', searchInput);
-  await page.click('.AutoCompleteStyle_submitButton__GkxPO')
-  await page.waitForNavigation({ waitUntil: 'domcontentloaded' })
-  await page.click('.Dropdown_Dropdown__yBuX5');
-  
-  const dropdownCategory = await page.$eval('.Dropdown_DropdownHeader__N3Zqc', element => element.innerText)
-  if (dropdownCategory !== categorieToSearch) {
-    await page.click(`[title="${categorieToSearch}"]`);
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' })
-  } 
 
   const links = await page.$$eval('.SearchCard_ProductCard_Inner__7JhKb', el => el.map(
     link => link.href
   ))
 
   for(const link of links){
-    if (link === links[0] || count === 6) {
+    if (link === links[0] || count === 10) {
       continue;
     }
 
