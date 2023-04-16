@@ -48,10 +48,10 @@ export default async function buscapeScraping(categorieToSearch, searchInput) {
     const price = await page.$eval('.Price_ValueContainer__1U9ia', element => element.innerText)
 
     const product = {
-      title: title.split(" ").slice(0, 4).join(" "),
+      title: title.split(' ').slice(0, 4).join(' '),
       photo,
-      description: `${description.join(' ').slice(0, 150)}...`,
-      price,
+      description: `${description.join(' ').split(' ').slice(0, 22).join(' ')}...`,
+      price: `${price}`,
       link,
       seller: 'buscape',
       category: categorieToSearch,

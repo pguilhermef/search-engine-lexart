@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const productsInDatabase = await prisma.product.findMany({
       where: {
         category: categorieToSearch,
-        title: {
+        description: {
           contains: searchInput,
         },
         seller: 'meli'
