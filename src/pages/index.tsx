@@ -61,11 +61,6 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSearched])
 
-  const handleCategoryChange = (event: React.ChangeEvent<EventTarget | HTMLInputElement>) => {
-    const target = event.target as HTMLInputElement;
-    setCategory(target.value);
-  };
-
   const handleSearchChange = (event: React.ChangeEvent<EventTarget | HTMLInputElement>) => {
     const target = event.target as HTMLInputElement;
     setSearchQuery(target.value);
@@ -79,28 +74,18 @@ export default function Home() {
     <main className="h-screen w-screen flex justify-center items-center">
       <div className="flex flex-col justify-start items-center bg-white border-4 border-black h-5/6 w-3/4 max-w-5xl">
         <div className="flex justify-center items-center my-10 gap-4 flex-wrap">
-          <Dropdown sellerSelected={seller} websites={websites} onChange={(v) => setSeller(v)} />
-          <div>
-            <label htmlFor="category" className="sr-only">
-              Category
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={category}
-              onChange={handleCategoryChange}
-              className="rounded-md border-gray-300 shadow-sm text-white bg-indigo-800 hover:bg-indigo-600 px-4 py-2"
-            >
-              <option value="" disabled hidden>
-                Categories
-              </option>
-              {categories.map((option) => (
-                <option key={option} value={option} className="text-black bg-white hover:bg-slate-400">
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Dropdown
+            dropdownGroupName="websites"
+            selectedOption={seller}
+            options={websites}
+            onChange={(e) => setSeller(e)}
+          />
+          <Dropdown
+            dropdownGroupName="categories"
+            selectedOption={category}
+            options={categories}
+            onChange={(e) => setCategory(e)}
+          />
           <div>
             <input
               type="text"

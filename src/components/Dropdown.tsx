@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
 
 type Props = {
-  sellerSelected: string;
-  websites: string[];
-  onChange: (sellerSelected: string) => void;
+  dropdownGroupName: string;
+  selectedOption: string;
+  options: string[];
+  onChange: (selectedOption: string) => void;
 }
 
-export default function Dropdown({sellerSelected, websites, onChange}: Props) {
+export default function Dropdown({dropdownGroupName, selectedOption, options, onChange}: Props) {
   const handleSeller = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const sellerSelected = event.target.value;
-    onChange(sellerSelected);
+    const selectedOption = event.target.value;
+    onChange(selectedOption);
   };
   
   return (
@@ -18,20 +19,20 @@ export default function Dropdown({sellerSelected, websites, onChange}: Props) {
         Websites
       </label>
       <select
-      value={sellerSelected}
+      value={selectedOption}
       onChange={handleSeller}
       className="rounded-md border-gray-300 shadow-sm text-white bg-indigo-800 hover:bg-indigo-600 px-4 py-2"
       >
         <option value="" disabled hidden>
-          Websites
+          {dropdownGroupName}
         </option>
-        {websites.map((sellerSelected) => (
+        {options.map((selectedOption) => (
           <option
-          key={sellerSelected}
-          value={sellerSelected}
+          key={selectedOption}
+          value={selectedOption}
           className="text-black bg-white hover:bg-slate-400"
           >
-            {sellerSelected}
+            {selectedOption}
           </option>
         ))}
       </select>
