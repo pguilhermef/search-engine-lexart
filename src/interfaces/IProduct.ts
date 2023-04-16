@@ -1,5 +1,4 @@
-export default interface IProduct {
-  id: number
+export interface INewProduct {
   title: string,
   photo: string,
   description: string,
@@ -7,4 +6,7 @@ export default interface IProduct {
   link: string,
   seller: string,
   category: string,
+}
+export default interface IProduct extends INewProduct {
+  id: number;
 }
