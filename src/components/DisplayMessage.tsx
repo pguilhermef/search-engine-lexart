@@ -7,7 +7,7 @@ type Props = {
 
 const messages: IMessages = {
   'initial': 'Search for a product!',
-  'searching': 'Searching...',
+  'searching': 'Searching for products, please wait a few seconds.',
   'errorInSearch': 'Error during search, please try again or try a different term'
 };
 

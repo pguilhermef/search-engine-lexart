@@ -19,13 +19,14 @@ export default function Home() {
   const [category, setCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearched, setIsSearched] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('initial')
 
   useEffect(() => {
     if (isSearched) {
     setIsSearched(false)
-
     setMessage('searching')
+    setIsLoading(true)
 
     fetch(`/api/buscape?categorieToSearch=${encodeURIComponent(category)}&searchInput=${encodeURIComponent(searchQuery)}`)
       .then(response => response.json())
@@ -35,7 +36,8 @@ export default function Home() {
         }
         setProducts(data.products)
       })
-      .then(() => setMessage('errorInSearch'))
+      .then(() => setIsLoading(false))
+
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSearched])
@@ -121,11 +123,12 @@ export default function Home() {
               onClick={handleSearchSubmit}
               className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-800 hover:bg-indigo-600 focus:outline-none"
             >
-              Search
+              Pesquisar
             </button>
           </div>
         </div>
-        { products.length > 0 ? (
+        { isLoading && <DisplayMessage message={message} /> }
+        {(!isLoading && products.length > 0) && (
           <div className="flex justify-center flex-wrap max-w-2xl h-4/6 overflow-y-scroll">
           {products.map((product: IProduct) => (
             <div key={product.id} className='my-5'>
@@ -148,7 +151,6 @@ export default function Home() {
                 {/* Infos */}
                 <div className='flex flex-col items-start mx-5 gap-y-4'>
                   <div className='font-semibold text-xl'>
-                    {/* here catch the first two words of name */}
                     {product.title}
                   </div>
                   <div className='max-w-[20rem]'>
@@ -162,9 +164,9 @@ export default function Home() {
                 <div>
                   <Link href={product.link} target='_blank'>
                     <div
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-800 hover:bg-indigo-600 focus:outline-none"
+                      className="inline-flex items-center px-2 py-2 mx-4 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-800 hover:bg-indigo-600 focus:outline-none text-center"
                       >
-                      Search
+                      Ir para web
                     </div>
                   </Link>
                 </div>
@@ -172,8 +174,6 @@ export default function Home() {
             </div>
           ))}
         </div>
-        ) : (
-          <DisplayMessage message={message} />
         )}
       </div>
     </main>
