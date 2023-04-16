@@ -25,7 +25,7 @@ export default async function buscapeScraping(categorieToSearch, searchInput) {
 
   const buscapeUrl = `https://www.buscape.com.br/search?q=${searchInput}&refinements%5B0%5D%5Bid%5D=categoryId&refinements%5B0%5D%5Bvalues%5D%5B0%5D=${categoryId}&isDealsPage=false`
 
-  const browser = await puppeteer.launch({ headless: false })
+  const browser = await puppeteer.launch()
   const page = await browser.newPage()
   await page.setViewport({ width: 1200, height: 800 });
 
