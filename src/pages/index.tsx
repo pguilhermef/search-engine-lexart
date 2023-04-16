@@ -10,6 +10,7 @@ import meliLogo from '../../public/logo-meli.png'
 import buscapeLogo from '../../public/logo-buscape.png'
 import { fetchBuscape, fetchMeli } from "../../lib/fetchs";
 import Dropdown from "@/components/Dropdown";
+import SearchInput from "@/components/SearchInput";
 
 
 const categories = ['Geladeira', 'TV', 'Celular'];
@@ -61,11 +62,6 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSearched])
 
-  const handleSearchChange = (event: React.ChangeEvent<EventTarget | HTMLInputElement>) => {
-    const target = event.target as HTMLInputElement;
-    setSearchQuery(target.value);
-  };
-
   const handleSearchSubmit = () => {
     setIsSearched(!isSearched)
   };
@@ -86,16 +82,11 @@ export default function Home() {
             options={categories}
             onChange={(e) => setCategory(e)}
           />
-          <div>
-            <input
-              type="text"
-              name="search"
-              placeholder="Search products"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="rounded-md border-2 border-black shadow-sm px-4 py-2"
-            />
-          </div>
+          <SearchInput
+            placeholder={'Geladeira Samsung'}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e)}
+          />
           <div>
             <button
               type="button"
