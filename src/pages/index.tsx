@@ -11,6 +11,7 @@ import buscapeLogo from '../../public/logo-buscape.png'
 import { fetchBuscape, fetchMeli } from "../../lib/fetchs";
 import Dropdown from "@/components/Dropdown";
 import SearchInput from "@/components/SearchInput";
+import SubmitButton from "@/components/SubmitButton";
 
 
 const categories = ['Geladeira', 'TV', 'Celular'];
@@ -20,7 +21,7 @@ export default function Home() {
   const [products, setProducts] = useState<IProduct[]>([]) 
   const [seller, setSeller] = useState('');
   const [category, setCategory] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSeachInput] = useState('');
   const [isSearched, setIsSearched] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('initial')
@@ -35,14 +36,14 @@ export default function Home() {
       case 'Mercado Livre':
         setProducts([])
 
-        fetchMeli(category, searchQuery)
+        fetchMeli(category, searchInput)
           .then(products => setProducts(products))
           .then(() => setIsLoading(false))
         break;
       case 'Buscapé':
         setProducts([])
 
-        fetchBuscape(category, searchQuery)
+        fetchBuscape(category, searchInput)
           .then(products => setProducts(products))
           .then(() => setIsLoading(false))
         break;
@@ -50,8 +51,8 @@ export default function Home() {
         setProducts([])
 
         Promise.all([
-          fetchMeli(category, searchQuery),
-          fetchBuscape(category, searchQuery)
+          fetchMeli(category, searchInput),
+          fetchBuscape(category, searchInput)
         ]).then(([meliProducts, buscapeProducts]) => {
           setProducts([...meliProducts, ...buscapeProducts] as IProduct[])
           setIsLoading(false)
@@ -62,8 +63,8 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSearched])
 
-  const handleSearchSubmit = () => {
-    setIsSearched(!isSearched)
+  const handleSearchButtonClick = () => {
+    setIsSearched(prevState => !prevState);
   };
 
   return (
@@ -84,18 +85,10 @@ export default function Home() {
           />
           <SearchInput
             placeholder={'Geladeira Samsung'}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e)}
+            value={searchInput}
+            onChange={(e) => setSeachInput(e)}
           />
-          <div>
-            <button
-              type="button"
-              onClick={handleSearchSubmit}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-800 hover:bg-indigo-600 focus:outline-none"
-            >
-              Pesquisar
-            </button>
-          </div>
+          <SubmitButton placeholder="Pesquisar" onChange={handleSearchButtonClick}/>
         </div>
         { isLoading && <DisplayMessage message={message} /> }
         {(!isLoading && products.length > 0) && (
