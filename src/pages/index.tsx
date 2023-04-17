@@ -15,12 +15,12 @@ const websites = ['Todas', 'Mercado Livre', 'Buscapé'];
 
 export default function Home() {
   const [products, setProducts] = useState<IProduct[]>([]) 
-  const [seller, setSeller] = useState('');
-  const [category, setCategory] = useState('');
-  const [searchInput, setSeachInput] = useState('');
-  const [isSearched, setIsSearched] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState('initial')
+  const [seller, setSeller] = useState<string>('');
+  const [category, setCategory] = useState<string>('');
+  const [searchInput, setSeachInput] = useState<string>('');
+  const [isSearched, setIsSearched] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [message, setMessage] = useState<string>('initial')
 
   useEffect(() => {
     if (isSearched) {
