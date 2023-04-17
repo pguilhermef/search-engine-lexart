@@ -20,6 +20,7 @@ export default function Home() {
   const [searchInput, setSeachInput] = useState<string>('');
   const [isSearched, setIsSearched] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [hasError, setHasError] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('initial')
 
   useEffect(() => {
@@ -27,20 +28,37 @@ export default function Home() {
     setIsSearched(false)
     setMessage('searching')
     setIsLoading(true)
+    setHasError(false)
 
     switch (seller) {
       case 'Mercado Livre':
         setProducts([])
 
         fetchMeli(category, searchInput)
-          .then(products => setProducts(products))
+          .then(products => {
+            if (products.length === 0) {
+              setHasError(true)
+              setMessage('errorInSearch')
+            } else {
+              setProducts(products)
+              setMessage('searching')
+            }
+          })
           .then(() => setIsLoading(false))
         break;
       case 'Buscapé':
         setProducts([])
 
         fetchBuscape(category, searchInput)
-          .then(products => setProducts(products))
+          .then(products => {
+            if (products.length === 0) {
+              setHasError(true)
+              setMessage('errorInSearch')
+            } else {
+              setProducts(products)
+              setMessage('searching')
+            }
+          })
           .then(() => setIsLoading(false))
         break;
       default:
@@ -50,7 +68,14 @@ export default function Home() {
           fetchMeli(category, searchInput),
           fetchBuscape(category, searchInput)
         ]).then(([meliProducts, buscapeProducts]) => {
-          setProducts([...meliProducts, ...buscapeProducts] as IProduct[])
+          const allProducts = [...meliProducts, ...buscapeProducts] as IProduct[]
+          if (allProducts.length === 0) {
+            setHasError(true)
+            setMessage('errorInSearch')
+          } else {
+            setProducts(allProducts)
+            setMessage('searching')
+          }
           setIsLoading(false)
         })
         break;
@@ -59,11 +84,11 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSearched])
 
-  useEffect(() => {
-    if(message !== 'initial' && !isLoading){
-      products.length === 0 ? setMessage('errorInSearch') : setMessage('searching')
-    }
-  }, [message, products, isLoading])
+  // useEffect(() => {
+  //   if(message === 'searching' && !isLoading){
+  //     products.length === 0 ? setMessage('errorInSearch') : setMessage('searching')
+  //   }
+  // }, [message, products, isLoading])
 
   const handleSearchButtonClick = () => {
     setMessage('searching')
