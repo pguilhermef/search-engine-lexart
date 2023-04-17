@@ -59,7 +59,14 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSearched])
 
+  useEffect(() => {
+    if(message !== 'initial' && !isLoading){
+      products.length === 0 ? setMessage('errorInSearch') : setMessage('searching')
+    }
+  }, [message, products, isLoading])
+
   const handleSearchButtonClick = () => {
+    setMessage('searching')
     setIsSearched(prevState => !prevState);
   };
 
@@ -86,7 +93,7 @@ export default function Home() {
           />
           <SubmitButton placeholder="Pesquisar" onChange={handleSearchButtonClick}/>
         </div>
-        { isLoading && <DisplayMessage message={message} /> }
+        { (isLoading || message === 'errorInSearch') && <DisplayMessage message={message} /> }
 
         {(!isLoading && products.length > 0) && <ProductsList products={products}/>}
       </div>

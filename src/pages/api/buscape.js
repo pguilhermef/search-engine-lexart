@@ -26,15 +26,18 @@ export default async function handler(req, res) {
     }
 
     console.log('Searching products...');
-    const productsInScrap = await buscapeScraping(categorieToSearch, searchInput);
 
-    if (productsInScrap.message) {
-      return res.status(400).json({ message: productsInScrap.message, products: [] });
+    let productsInScrap = []
+
+    try {
+      productsInScrap = await buscapeScraping(categorieToSearch, searchInput);
+      await prisma.product.createMany({
+        data: productsInScrap.products,
+      });
+    } catch (error) {
+      productsInScrap.products = [];
     }
 
-    await prisma.product.createMany({
-      data: productsInScrap.products,
-    });
 
     return res.status(200).json({ message: null, products: productsInScrap.products });
   } catch (error) {

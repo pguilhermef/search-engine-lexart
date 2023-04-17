@@ -26,15 +26,18 @@ export default async function handler(req, res) {
     }
 
     console.log('Searching products...');
-    const productsFromApi = await freeMarketApi(categorieToSearch, searchInput);
 
-    if (productsFromApi.message) {
-      return res.status(400).json({ message: productsFromApi.message, products: [] });
+    let productsFromApi = []
+
+    try {
+      productsFromApi = await freeMarketApi(categorieToSearch, searchInput);
+
+      await prisma.product.createMany({
+        data: productsFromApi.products,
+      });
+    } catch (error) {
+      productsFromApi.products = []
     }
-
-    await prisma.product.createMany({
-      data: productsFromApi.products,
-    });
 
     return res.status(200).json({ message: null, products: productsFromApi.products });
   } catch (error) {
