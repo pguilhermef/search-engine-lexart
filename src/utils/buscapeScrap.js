@@ -1,8 +1,30 @@
-const puppeteer = require('puppeteer');
+const chromium = require('chrome-aws-lambda');
+
+let chrome = {}
+let puppeteer;
+
+if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+  chrome = require('chrome-aws-lambda')
+  puppeteer = require("puppeteer-core")
+} else {
+  puppeteer = require("puppeteer")
+}
 
 export default async function buscapeScraping(categorieToSearch, searchInput) {
   const products = [];
   let count = 0;
+
+  let options = {}
+
+  if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+    options = {
+      args: [...chrome.args, "--hide-scrollbars", "disable-web-security"],
+      defaultViewport: ({ width: 1200, height: 800 }),
+      executablePath: await chromium.executablePath,
+      headless: true,
+      ignoreHTTPSErrors: true,
+    };
+  }
 
   let categoryId = 0;
   const tvId = 3;
@@ -25,9 +47,11 @@ export default async function buscapeScraping(categorieToSearch, searchInput) {
 
   const buscapeUrl = `https://www.buscape.com.br/search?q=${searchInput}&refinements%5B0%5D%5Bid%5D=categoryId&refinements%5B0%5D%5Bvalues%5D%5B0%5D=${categoryId}&isDealsPage=false`
 
-  const browser = await puppeteer.launch()
-  const page = await browser.newPage()
-  await page.setViewport({ width: 1200, height: 800 });
+  let browser = await puppeteer.launch(options)
+
+  let page = await browser.newPage();
+
+  console.log('alô, fala comigo');
 
   await page.goto(buscapeUrl, { waitUntil: 'domcontentloaded' })
 
