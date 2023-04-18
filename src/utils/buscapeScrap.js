@@ -1,30 +1,9 @@
-const chromium = require('chrome-aws-lambda');
-
-let chrome = {}
-let puppeteer;
-
-if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-  chrome = require('chrome-aws-lambda')
-  puppeteer = require("puppeteer-core")
-} else {
-  puppeteer = require("puppeteer")
-}
+const puppeteer = require('puppeteer');
+import cheerio from 'cheerio';
 
 export default async function buscapeScraping(categorieToSearch, searchInput) {
   const products = [];
   let count = 0;
-
-  let options = {}
-
-  if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-    options = {
-      args: [...chrome.args, "--hide-scrollbars", "disable-web-security"],
-      defaultViewport: ({ width: 1200, height: 800 }),
-      executablePath: await chromium.executablePath,
-      headless: true,
-      ignoreHTTPSErrors: true,
-    };
-  }
 
   let categoryId = 0;
   const tvId = 3;
@@ -47,9 +26,9 @@ export default async function buscapeScraping(categorieToSearch, searchInput) {
 
   const buscapeUrl = `https://www.buscape.com.br/search?q=${searchInput}&refinements%5B0%5D%5Bid%5D=categoryId&refinements%5B0%5D%5Bvalues%5D%5B0%5D=${categoryId}&isDealsPage=false`
 
-  let browser = await puppeteer.launch(options)
-
-  let page = await browser.newPage();
+  const browser = await puppeteer.launch()
+  const page = await browser.newPage()
+  await page.setViewport({ width: 1200, height: 800 });
 
   await page.goto(buscapeUrl, { waitUntil: 'domcontentloaded' })
 
@@ -64,10 +43,13 @@ export default async function buscapeScraping(categorieToSearch, searchInput) {
 
     await page.goto(link, { waitUntil: 'domcontentloaded' })
 
-    const title = await page.$eval('.Title_Name__qQvSr', element => element.innerText)
-    const photo = await page.$eval('.swiper-slide > img ', element => element.src)
-    const description = await page.$$eval('.Description_GradientOverflow__ncmUo > div > p', elements => elements.map(element => element.innerText))
-    const price = await page.$eval('.Price_ValueContainer__1U9ia', element => element.innerText)
+    const html = await page.content();
+    const $ = cheerio.load(html);
+
+    const title = $('.Title_Name__qQvSr').text()
+    const photo = $('.swiper-slide > img ').attr('src')
+    const description = $('.Description_GradientOverflow__ncmUo > div > p').map((_, element) => $(element).text()).get()
+    const price = $('.Price_ValueContainer__1U9ia').text()
 
     const product = {
       title: title.split(' ').slice(0, 4).join(' '),
@@ -78,8 +60,6 @@ export default async function buscapeScraping(categorieToSearch, searchInput) {
       seller: 'buscape',
       category: categorieToSearch,
     }
-
-    console.log(product);
 
     products.push(product)
 
