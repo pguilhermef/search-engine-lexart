@@ -18,10 +18,8 @@ export default async function handler(req, res) {
     let productsInScrap = []
 
     try {
-      console.log('scraping..');
       productsInScrap = await buscapeScraping(categorieToSearch, searchInput);
-      console.log('creating..');
-      // await createProducts(productsInScrap.products)
+      await createProducts(productsInScrap.products)
     } catch (error) {
       productsInScrap.products = [];
     }
