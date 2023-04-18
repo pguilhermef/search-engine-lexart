@@ -1,43 +1,28 @@
-import { PrismaClient } from '@prisma/client';
 import buscapeScraping from  '../../utils/buscapeScrap'
-
-const prisma = new PrismaClient()
+import { findProducts, createProducts } from '../../../lib/database'
 
 export default async function handler(req, res) {
   const { categorieToSearch, searchInput } = req.query;
 
-  if (!categorieToSearch || !searchInput) {
-    return res.status(400).json({ message: 'Parâmetros faltando na requisição.' });
-  }
-
   try {
-    const productsInDatabase = await prisma.product.findMany({
-      where: {
-        category: categorieToSearch,
-        description: {
-          contains: searchInput,
-        },
-        seller: 'buscape',
-      },
-    });
+    const productsInDatabase = await findProducts(categorieToSearch, searchInput)
+
+    console.log('Searching products in database...');
 
     if (productsInDatabase.length > 0) {
       return res.status(200).json({ message: null, products: productsInDatabase });
     }
 
-    console.log('Searching products...');
+    console.log('Searching products in web...');
 
     let productsInScrap = []
 
     try {
       productsInScrap = await buscapeScraping(categorieToSearch, searchInput);
-      await prisma.product.createMany({
-        data: productsInScrap.products,
-      });
+      await createProducts(productsInScrap.products)
     } catch (error) {
       productsInScrap.products = [];
     }
-
 
     return res.status(200).json({ message: null, products: productsInScrap.products });
   } catch (error) {
